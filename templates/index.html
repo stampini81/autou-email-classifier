@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoU Email Classifier</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">AutoU Email Classifier</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-sm p-4">
+                    <h2 class="mb-3 text-center text-primary">Classifique seu Email</h2>
+                    <form id="emailForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="emailText" class="form-label">Cole o texto do email</label>
+                            <textarea id="emailText" name="emailText" rows="5" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-3 text-center text-muted">ou</div>
+                        <div class="mb-3">
+                            <label for="emailFile" class="form-label">Upload do arquivo (.txt ou .pdf)</label>
+                            <input type="file" id="emailFile" name="emailFile" accept=".txt,.pdf" class="form-control">
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary btn-lg me-2">Classificar</button>
+                            <button type="button" id="clearBtn" class="btn btn-outline-secondary btn-lg">Limpar</button>
+                        </div>
+                    </form>
+                    <div id="result" class="alert alert-info mt-4 d-none">
+                        <h4 class="alert-heading">Resultado</h4>
+                        <p><strong>Categoria:</strong> <span id="categoria"></span></p>
+                        <p><strong>Resposta sugerida:</strong> <span id="resposta"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    const form = document.getElementById('emailForm');
+    const resultDiv = document.getElementById('result');
+    const categoriaSpan = document.getElementById('categoria');
+    const respostaSpan = document.getElementById('resposta');
+    const clearBtn = document.getElementById('clearBtn');
+    const emailText = document.getElementById('emailText');
+    const emailFile = document.getElementById('emailFile');
+
+    // Loader visual
+    let loader = document.createElement('div');
+    loader.className = 'text-center my-3';
+    loader.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Processando...</span></div>';
+
+    form.onsubmit = async function(e) {
+        e.preventDefault();
+        resultDiv.classList.add('d-none');
+        form.parentNode.insertBefore(loader, form.nextSibling);
+        try {
+            const formData = new FormData(form);
+            const response = await fetch('/classify', {
+                method: 'POST',
+                body: formData
+            });
+            let data;
+            try {
+                data = await response.json();
+            } catch (err) {
+                data = {categoria: 'Erro', resposta: 'Erro ao processar resposta do servidor.'};
+            }
+            categoriaSpan.textContent = data.categoria || 'Erro';
+            respostaSpan.textContent = data.resposta || 'Erro ao processar.';
+        } catch (error) {
+            categoriaSpan.textContent = 'Erro';
+            respostaSpan.textContent = 'Falha na comunicação com o servidor.';
+        } finally {
+            loader.remove();
+            resultDiv.classList.remove('d-none');
+        }
+    };
+
+    clearBtn.onclick = function() {
+        emailText.value = '';
+        emailFile.value = '';
+        resultDiv.classList.add('d-none');
+    };
+    </script>
+</body>
+</html>

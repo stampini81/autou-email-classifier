@@ -1,0 +1,12 @@
+# Requisitos do projeto
+flask
+transformers
+openai
+pdfplumber
+scikit-learn
+nltk
+python-dotenv
+werkzeug
+google-generativeai
+pytesseract
+pillow
