@@ -1,221 +1,161 @@
+Com certeza\! O seu `README.md` atual tem todas as informações necessárias, mas, como você mesmo notou, a estrutura pode ser otimizada para seguir um fluxo mais lógico e profissional para quem vai avaliar o projeto.
 
-# AutoU — Email Classifier (README de entrega)
-----
+A ideia é guiar o leitor (o avaliador da AutoU) desde o que o projeto é, como vê-lo funcionando rapidamente (links), e só depois detalhar como rodá-lo localmente.
 
-Sumário rápido
-- URL (local): http://localhost:5000
-- Endpoints principais: `/` (UI), `/classify` (POST)
-- Formatos aceitos: `.txt`, `.pdf` (pesquisável e imagens via OCR)
+Aqui está uma versão reestruturada e aprimorada, que elimina repetições e cria uma narrativa clara do início ao fim.
 
-Requisitos atendidos
-- Interface Web para upload e inserção de texto
-- Extração de texto (pdfplumber + pytesseract OCR)
-- NLP básico (stopwords + stemming via NLTK)
-- Classificação e geração de resposta via OpenAI GPT
-- Persistência (SQLite via SQLAlchemy)
-- Mecanismo de disambiguamento quando usuário envia texto + arquivo
+-----
 
-----
+### Sugestão de `README.md` Aprimorado:
 
-Pré-requisitos (local)
-- Python 3.11+ (ou 3.10 compatível)
-- Tesseract OCR instalado e no PATH (para OCR em PDFs)
-- Conta OpenAI com chave válida (opcional: para rodar com IA)
-# AutoU — Email Classifier
+````markdown
+# Classificador de E-mails com IA para AutoU
 
-Aplicação Flask para classificação de e-mails em "Produtivo" ou "Improdutivo" e sugestão de resposta automática. Aceita texto, `.txt` ou `.pdf` (com OCR via Tesseract). Persistência local em SQLite. Pronto para deploy via Docker e CI automatizado.
+![CI](https://github.com/<SEU_USUARIO>/<SEU_REPOSITORIO>/actions/workflows/ci.yml/badge.svg)
 
-## Sumário
-- [Pré-requisitos](#pré-requisitos)
-- [Instalação local](#instalação-local)
-- [Configuração do ambiente](#configuração-do-ambiente)
-- [Execução local](#execução-local)
-- [Validação na interface web](#validação-na-interface-web)
-- [Testes automatizados](#testes-automatizados)
-- [Execução via Docker](#execução-via-docker)
-- [CI/CD](#cicd)
-- [Checklist de submissão](#checklist-de-submissão)
-- [Contato](#contato)
+Este projeto é a minha submissão para o case prático do processo seletivo da AutoU. A aplicação web utiliza Inteligência Artificial para classificar e-mails como "Produtivo" ou "Improdutivo" e sugerir uma resposta automática, otimizando o fluxo de trabalho de equipes que lidam com um grande volume de mensagens.
 
-## Pré-requisitos
-- Python 3.10+
-- Git
-- (Para OCR) Tesseract OCR instalado (ou use Docker)
-- Conta OpenAI e chave de API
+---
 
-## Instalação local
-```powershell
-git clone <URL_DO_REPO>
-cd autou-email-classifier
+## 🚀 Acesso Rápido
+
+* **Aplicação Online:** **[LINK DA SUA APLICAÇÃO HOSPEDADA AQUI]**
+* **Vídeo Demonstrativo:** **[LINK DO SEU VÍDEO NO YOUTUBE AQUI]**
+
+---
+
+## ✨ Funcionalidades Principais
+
+* **Classificação com IA:** Utiliza o modelo `gpt-3.5-turbo` da OpenAI para analisar o conteúdo do e-mail e determinar sua categoria e uma resposta adequada.
+* **Suporte a Múltiplos Formatos:** Aceita entrada de texto direto, upload de arquivos `.txt` e `.pdf`.
+* **OCR Integrado:** Processa PDFs baseados em imagem (escaneados) utilizando Tesseract OCR para extração de texto.
+* **Interface Intuitiva:** Frontend simples para facilitar o upload e a visualização dos resultados.
+* **Mecanismo de Ambiguidade:** Caso o usuário envie texto e um arquivo simultaneamente, um modal é exibido para que ele escolha a fonte de dados a ser processada.
+* **Persistência de Dados:** Salva o histórico de classificações em um banco de dados SQLite local.
+
+## 🛠️ Tecnologias Utilizadas
+
+* **Backend:** Python 3.11, Flask, SQLAlchemy
+* **Inteligência Artificial:** OpenAI API
+* **Processamento de Arquivos:** pdfplumber (para PDFs de texto), pytesseract (para OCR)
+* **Testes:** Pytest
+* **Containerização:** Docker
+* **CI/CD:** GitHub Actions
+
+---
+
+## ⚙️ Configuração e Execução Local
+
+Siga os passos abaixo para configurar e executar o projeto em seu ambiente local.
+
+### Pré-requisitos
+
+* Python 3.10+
+* Git
+* [Tesseract OCR](https://github.com/tesseract-ocr/tessdoc) (necessário para processar PDFs de imagem. Se preferir, pule esta instalação e use o Docker).
+* Uma chave de API válida da OpenAI.
+
+### 1. Instalação
+
+Clone o repositório e instale as dependências Python em um ambiente virtual.
+
+```bash
+# Clone o repositório
+git clone [https://github.com/](https://github.com/)<SEU_USUARIO>/<SEU_REPOSITORIO>.git
+cd <NOME_DO_DIRETORIO>
+
+# Crie e ative o ambiente virtual
 python -m venv .venv
+# Windows
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python -c "import nltk; nltk.download('stopwords')"
-```
-# Integração com OpenAI GPT
+# macOS / Linux
+source .venv/bin/activate
 
-O projeto utiliza o GPT (OpenAI) para classificar e sugerir respostas automáticas aos emails.
+# Instale as dependências
+pip install -r requirements.txt
 
-## Como configurar a chave da OpenAI
+# Baixe os pacotes necessários do NLTK
+python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt')"
+````
 
-1. Crie um arquivo `.env` na raiz do projeto
-2. Cole sua chave da OpenAI no formato:
-	```
-	OPENAI_API_KEY=sk-xxxxxx
-	```
-3. **Nunca compartilhe sua chave em público ou em repositórios!**
+### 2\. Configuração do Ambiente
 
-## Dependências
+Crie um arquivo chamado `.env` na raiz do projeto e adicione suas variáveis de ambiente.
 
-O projeto já inclui `openai` e `python-dotenv` no requirements.txt. Se necessário, instale manualmente:
-```
-pip install openai python-dotenv
+```env
+# .env
+OPENAI_API_KEY="sk-sua-chave-aqui"
+SUPPORT_PHONE="+55 (11) 4000-0000"
+SUPPORT_EMAIL="suporte@autou.com.br"
 ```
 
-## Observações
-- O modelo padrão é o `gpt-3.5-turbo`. Para usar o GPT-4, altere o parâmetro `model` no código.
-- A chave é carregada automaticamente do `.env`.
-- O uso da API pode gerar custos conforme o volume de requisições.
+**Importante:** O arquivo `.env` está no `.gitignore` e nunca deve ser versionado.
 
-## Configuração do ambiente
-Crie um arquivo `.env` na raiz:
-```
-OPENAI_API_KEY=sk-...
-SUPPORT_PHONE=+55 (11) 4000-0000
-SUPPORT_EMAIL=suporte@autou.com.br
-```
-Não comite `.env`.
+### 3\. Execução
 
-## Execução local
-```powershell
-.\.venv\Scripts\Activate.ps1
+Com o ambiente virtual ativado, inicie a aplicação Flask:
+
+```bash
 python app/main.py
-# Acesse http://127.0.0.1:5000
 ```
 
-## Validação na interface web
-1. Cole texto ou faça upload de `.txt`/`.pdf`.
-2. Clique em "Classificar".
-3. Veja categoria e resposta sugerida.
-4. Se enviar texto + arquivo, escolha a fonte no modal.
+A aplicação estará disponível em **[http://127.0.0.1:5000](http://127.0.0.1:5000)**.
 
-## Testes automatizados
-```powershell
-python -m pytest -q
-```
+-----
 
-## Execução via Docker
-```sh
+## 🐳 Executando com Docker
+
+Se você não quiser instalar o Tesseract e as dependências localmente, pode usar o Docker. O `Dockerfile` já cuida de toda a configuração.
+
+```bash
+# 1. Construa a imagem Docker
 docker build -t autou-email-classifier .
+
+# 2. Execute o container, passando o arquivo .env
 docker run -p 5000:5000 --env-file .env autou-email-classifier
-# Acesse http://localhost:5000
 ```
 
-## CI/CD
-O repositório inclui workflow GitHub Actions (`.github/workflows/ci.yml`) que instala dependências, Tesseract e executa os testes.
+A aplicação estará disponível em **[http://localhost:5000](https://www.google.com/search?q=http://localhost:5000)**.
 
-## Checklist de submissão
-- [ ] Repositório público (GitHub)
-- [ ] Vídeo demonstrativo (3-5 min)
-- [ ] Link da aplicação hospedada
-- [ ] Apenas `README.md` como arquivo Markdown
-- [ ] Sem segredos/versionamento de `.env` ou `emails.db`
+-----
 
-## Contato
-Leandro da Silva Stampini
+## 🧪 Testes Automatizados
 
-```powershell
-python app/main.py
-```
+O projeto conta com uma suíte de testes automatizados para garantir a qualidade do código e das funcionalidades principais. Para executá-los:
 
-3. Abra no navegador: http://127.0.0.1:5000
-
-Observação: se preferir rodar via environment variable FLASK_APP/FLASK_ENV, ajuste conforme seu fluxo, mas `python app/main.py` inicia a aplicação diretamente.
-
-
-7) Validando na interface web (passo a passo)
---------------------------------------------
-Esses passos garantem que você execute as validações exigidas pelo Case.
-
-a) Teste básico com texto colado
-
-1. Abra a página principal
-2. No campo de texto cole o conteúdo de um e-mail (ex: assunto + corpo)
-3. Clique em "Classificar"
-4. Aguarde o resultado — o painel mostrará a "Categoria" e a "Resposta sugerida"
-
-Comportamento esperado: a API retorna JSON com `categoria` e `resposta`. A UI exibe estes campos.
-
-
-b) Teste com upload de arquivo `.txt`
-
-1. Na página principal, escolha o arquivo `.txt` (ex.: `samples/exemplo_produtivo.txt`)
-2. Clique em "Classificar"
-3. Verifique o texto extraído e o resultado na UI
-
-
-c) Teste com upload de PDF pesquisável
-
-1. Faça upload de um PDF que contenha texto pesquisável
-2. A aplicação usará `pdfplumber` para extrair o texto
-3. Confira o texto e a classificação no painel de resultados
-
-
-d) Teste com PDF escaneado / imagem (OCR)
-
-1. Faça upload de um PDF composto por imagens (scan)
-2. A aplicação fará fallback para `pytesseract` e tentará extrair o texto via OCR
-3. Valide o texto extraído na UI e a classificação
-
-
-e) Cenário de ambiguidade (texto + arquivo enviados juntos)
-
-1. Preencha o campo de texto E carregue um arquivo ao mesmo tempo
-2. O backend retornará `ambiguous: true` com "previews"
-3. A UI mostrará um modal com o preview do texto e do arquivo permitindo escolher qual fonte usar
-4. Ao escolher, a UI reenvia a requisição com `forceSource=file` ou `forceSource=form`
-
-Nota: isso evita que o sistema tente fundir duas fontes diferentes sem confirmação do usuário.
-
-
-8) Testes automatizados
-------------------------
-Os testes usam `pytest`.
-
-Para executar os testes:
-
-```powershell
+```bash
 python -m pytest -q
 ```
 
-O conjunto de testes cobre casos básicos de extração de `.txt`, comportamento de fallback para tickets de suporte e o endpoint de ambiguidade.
+## 🔄 CI/CD
 
+O repositório está configurado com um workflow de Integração Contínua usando **GitHub Actions** (`.github/workflows/ci.yml`). A cada `push` ou `pull request`, o workflow realiza as seguintes ações:
 
-9) Deploy (opcional)
----------------------
-Recomendações rápidas:
+1.  Configura o ambiente Python.
+2.  Instala as dependências do projeto.
+3.  Instala o Tesseract OCR.
+4.  Executa a suíte de testes com `pytest`.
 
-- Para replicabilidade, criar um `Dockerfile` que instale o Tesseract e as dependências Python. Posso gerar esse `Dockerfile` para você.
-- Plataformas: Render, Heroku (buildpacks para Tesseract), Replit, ou hospedar numa VM que tenha Tesseract instalado.
+## 👤 Contato
 
+**Leandro da Silva Stampini**
 
-10) Segurança e checklist de submissão
--------------------------------------
-- Verifique se não existem segredos no repositório (arquivo `.env`, `emails.db`). Se você comitou algum segredo, rotacione as chaves.
-- Itens para copiar no formulário de submissão:
-	- Link público do repositório (GitHub)
-	- Link do vídeo demonstrativo (3-5 minutos)
-	- Link da aplicação hospedada (URL pública) — se houver
+  * **LinkedIn:** [Seu Perfil no LinkedIn]
+  * **GitHub:** [@SeuUsuárioNoGitHub]
 
+<!-- end list -->
 
-11) Contato
------------
-Leandro da Silva Stampini
+```
 
-Notas técnicas e próximos passos
-- O repositório já inclui um `Dockerfile` que instala Tesseract e as dependências Python.
-- Um workflow GitHub Actions (`.github/workflows/ci.yml`) foi adicionado para executar `pytest` em pushes/PRs.
-- Recomenda-se verificar e rotacionar a chave OpenAI caso tenha sido comitada anteriormente.
+---
 
+### Por que esta estrutura é melhor:
 
+1.  **Clareza Imediata:** O avaliador vê os links da aplicação e do vídeo logo no início, que é o que ele mais precisa para uma avaliação rápida.
+2.  **Fluxo Lógico:** Segue a ordem: O que é > Como ver > O que faz > Como funciona > Como rodar localmente > Como testar.
+3.  **Conciso e Profissional:** Remove repetições e informações de "rascunho". As seções são bem definidas com títulos claros e emojis para guiar o olhar.
+4.  **Instruções Unificadas:** Todas as etapas de instalação e execução local estão em uma única seção, fácil de seguir.
+5.  **Contexto do Projeto:** A introdução conecta diretamente o projeto ao desafio proposto pela AutoU.
+
+Basta copiar e colar este conteúdo no seu `README.md` e preencher os links e informações pessoais nos locais indicados (`[SUA INFORMAÇÃO AQUI]`).
+```
