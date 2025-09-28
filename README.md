@@ -1,33 +1,5 @@
-# Integração com OpenAI GPT
 
-Agora o projeto utiliza o GPT (OpenAI) para classificar e sugerir respostas automáticas aos emails.
-
-## Como configurar a chave da OpenAI
-
-1. Crie um arquivo `.env` na raiz do projeto (já criado automaticamente).
-2. Cole sua chave da OpenAI no formato:
-	```
-	OPENAI_API_KEY=sk-xxxxxx
-	```
-3. **Nunca compartilhe sua chave em público ou em repositórios!**
-
-## Dependências
-
-O projeto já inclui `openai` e `python-dotenv` no requirements.txt. Se necessário, instale manualmente:
-```
-pip install openai python-dotenv
-```
-
-## Observações
-- O modelo padrão é o `gpt-3.5-turbo`. Para usar o GPT-4, altere o parâmetro `model` no código.
-- A chave é carregada automaticamente do `.env`.
-- O uso da API pode gerar custos conforme o volume de requisições.
 # AutoU — Email Classifier (README de entrega)
-
-Este README frontal foi preparado para apoiar a submissão do Case Prático AutoU. Ele descreve como executar a aplicação localmente, o que o projeto entrega e como testar os requisitos do desafio.
-
-IMPORTANTE: este arquivo é a versão final que será utilizada para avaliação; antes de submeter, revise e remova notas de desenvolvimento se necessário.
-
 ----
 
 Sumário rápido
@@ -81,6 +53,30 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 python -c "import nltk; nltk.download('stopwords')"
 ```
+# Integração com OpenAI GPT
+
+O projeto utiliza o GPT (OpenAI) para classificar e sugerir respostas automáticas aos emails.
+
+## Como configurar a chave da OpenAI
+
+1. Crie um arquivo `.env` na raiz do projeto
+2. Cole sua chave da OpenAI no formato:
+	```
+	OPENAI_API_KEY=sk-xxxxxx
+	```
+3. **Nunca compartilhe sua chave em público ou em repositórios!**
+
+## Dependências
+
+O projeto já inclui `openai` e `python-dotenv` no requirements.txt. Se necessário, instale manualmente:
+```
+pip install openai python-dotenv
+```
+
+## Observações
+- O modelo padrão é o `gpt-3.5-turbo`. Para usar o GPT-4, altere o parâmetro `model` no código.
+- A chave é carregada automaticamente do `.env`.
+- O uso da API pode gerar custos conforme o volume de requisições.
 
 ## Configuração do ambiente
 Crie um arquivo `.env` na raiz:
@@ -221,4 +217,5 @@ Notas técnicas e próximos passos
 - O repositório já inclui um `Dockerfile` que instala Tesseract e as dependências Python.
 - Um workflow GitHub Actions (`.github/workflows/ci.yml`) foi adicionado para executar `pytest` em pushes/PRs.
 - Recomenda-se verificar e rotacionar a chave OpenAI caso tenha sido comitada anteriormente.
+
 
