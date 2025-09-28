@@ -30,3 +30,39 @@ textarea.form-control {
     border-radius: 0 0 16px 16px;
     box-shadow: 0 2px 8px rgba(26,115,232,0.08);
 }
+
+/* Ambiguity modal styling */
+.ambig-modal .modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+}
+.ambig-modal .modal-header {
+    background: linear-gradient(90deg,#6366f1 0%, #0ea5e9 100%);
+    color: #fff;
+    border-bottom: none;
+}
+.ambig-modal .modal-header .modal-title { font-weight:700; }
+.ambig-modal .modal-body { background: #fbfdff; }
+.ambig-modal .preview-box {
+    background: #ffffff;
+    border: 1px solid rgba(99,102,241,0.08);
+    padding: 0.6rem;
+    border-radius: 8px;
+    max-height: 8rem;
+    overflow: auto;
+}
+.ambig-modal .btn-primary-grad {
+    background: linear-gradient(90deg,#06b6d4 0%, #6366f1 100%);
+    color: #fff;
+    border: none;
+}
+.ambig-modal .btn-outline-primary-grad {
+    border: 1px solid rgba(99,102,241,0.2);
+    color: #374151;
+    background: #fff;
+}
+.ambig-modal .modal-footer { background: transparent; border-top: none; }
+
+@media (max-width: 576px) {
+    .ambig-modal .preview-box { max-height: 6rem; }
+}

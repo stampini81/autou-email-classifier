@@ -5,45 +5,127 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoU Email Classifier</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; }
+        .hero {
+            background: linear-gradient(90deg, #f8fafc 60%, #e0e7ff 100%);
+            padding: 4rem 0 2rem 0;
+        }
+        .card-main {
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(80,80,160,0.08);
+            border: none;
+        }
+        .navbar-brand img { height: 40px; margin-right: 10px; }
+        .footer {
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        .btn-gradient {
+            background: linear-gradient(90deg, #6366f1 0%, #0ea5e9 100%);
+            color: #fff;
+            border: none;
+        }
+        .btn-gradient:hover { filter: brightness(1.08); }
+        .shadow-lg { box-shadow: 0 8px 32px rgba(80,80,160,0.12)!important; }
+        .result-icon { font-size: 2.2rem; color: #6366f1; }
+    </style>
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#">AutoU Email Classifier</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+                        <a class="navbar-brand d-flex align-items-center fw-bold" href="#">
+                                <picture>
+                                    <source srcset="/static/logo-autou.webp" type="image/webp">
+                                    <img src="/static/logo-autou.png" alt="Logo AutoU" style="height:40px;max-width:120px;object-fit:contain;" onerror="this.style.display='none'">
+                                </picture>
+                                AutoU Email Classifier
+                        </a>
         </div>
     </nav>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow-sm p-4">
-                    <h2 class="mb-3 text-center text-primary">Classifique seu Email</h2>
-                    <form id="emailForm" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="emailText" class="form-label">Cole o texto do email</label>
-                            <textarea id="emailText" name="emailText" rows="5" class="form-control"></textarea>
+    <section class="hero">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-lg-8 text-center mb-4">
+                    <h1 class="display-5 fw-bold text-primary mb-3">Classifique e Responda Emails com IA</h1>
+                    <p class="lead text-secondary mb-4">Automatize a triagem de emails, gere respostas automáticas e aumente sua produtividade. Suporte a arquivos PDF (texto e imagem) e .txt.</p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card card-main shadow-lg p-4">
+                        <h2 class="mb-3 text-center text-primary">Classifique seu Email</h2>
+                        <form id="emailForm" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="emailText" class="form-label">Cole o texto do email</label>
+                                <textarea id="emailText" name="emailText" rows="5" class="form-control"></textarea>
+                            </div>
+                            <div class="mb-3 text-center text-muted">ou</div>
+                            <div class="mb-3">
+                                <label for="emailFile" class="form-label">Upload do arquivo (.txt ou .pdf)</label>
+                                <input type="file" id="emailFile" name="emailFile" accept=".txt,.pdf" class="form-control">
+                            </div>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-gradient btn-lg me-2">Classificar</button>
+                                <button type="button" id="clearBtn" class="btn btn-outline-secondary btn-lg">Limpar</button>
+                            </div>
+                        </form>
+                        <div id="result" class="alert alert-info mt-4 d-none">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="result-icon me-2">📧</span>
+                                <h4 class="alert-heading mb-0">Resultado</h4>
+                            </div>
+                            <p class="mb-1"><strong>Categoria:</strong> <span id="categoria"></span></p>
+                            <p class="mb-0"><strong>Resposta sugerida:</strong> <span id="resposta"></span></p>
                         </div>
-                        <div class="mb-3 text-center text-muted">ou</div>
-                        <div class="mb-3">
-                            <label for="emailFile" class="form-label">Upload do arquivo (.txt ou .pdf)</label>
-                            <input type="file" id="emailFile" name="emailFile" accept=".txt,.pdf" class="form-control">
-                        </div>
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="submit" class="btn btn-primary btn-lg me-2">Classificar</button>
-                            <button type="button" id="clearBtn" class="btn btn-outline-secondary btn-lg">Limpar</button>
-                        </div>
-                    </form>
-                    <div id="result" class="alert alert-info mt-4 d-none">
-                        <h4 class="alert-heading">Resultado</h4>
-                        <p><strong>Categoria:</strong> <span id="categoria"></span></p>
-                        <p><strong>Resposta sugerida:</strong> <span id="resposta"></span></p>
+                                                <!-- Ambiguity modal -->
+                                                                        <div class="modal fade ambig-modal" id="ambigModal" tabindex="-1" aria-labelledby="ambigModalLabel" aria-hidden="true">
+                                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                                <div class="modal-content">
+                                                                                    <div class="modal-header d-flex align-items-center">
+                                                                                        <div class="me-3" style="font-size:1.8rem;line-height:1">📌</div>
+                                                                                        <div>
+                                                                                            <h5 class="modal-title" id="ambigModalLabel">Escolha a fonte para classificação</h5>
+                                                                                            <div class="small">Escolha qual conteúdo deve ser utilizado para gerar a classificação e a resposta.</div>
+                                                                                        </div>
+                                                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                                    </div>
+                                                                                    <div class="modal-body">
+                                                                                        <p id="ambigMessage" class="mb-2">Detectamos que você forneceu texto e upload. Escolha qual fonte deseja usar.</p>
+                                                                                        <div class="mb-3">
+                                                                                            <div class="small text-muted mb-1">Pré-visualização (texto)</div>
+                                                                                            <div id="ambigFormPreview" class="preview-box"></div>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <div class="small text-muted mb-1">Pré-visualização (upload)</div>
+                                                                                            <div id="ambigFilePreview" class="preview-box"></div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="modal-footer">
+                                                                                        <button type="button" id="useFormBtn" class="btn btn-primary-grad px-4 py-2">Usar Texto</button>
+                                                                                        <button type="button" id="useFileBtn" class="btn btn-outline-primary-grad px-4 py-2">Usar Upload</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+    <footer class="footer py-4 mt-5">
+        <div class="container text-center">
+            <div class="mb-2">Desenvolvido por <strong>Leandro da Silva Stampini</strong> &copy; 2025</div>
+            <div>Projeto open source para automação inteligente de emails corporativos.</div>
+        </div>
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+    (function(){
     const form = document.getElementById('emailForm');
     const resultDiv = document.getElementById('result');
     const categoriaSpan = document.getElementById('categoria');
@@ -52,43 +134,65 @@
     const emailText = document.getElementById('emailText');
     const emailFile = document.getElementById('emailFile');
 
-    // Loader visual
+    // Loader visual centralizado
     let loader = document.createElement('div');
-    loader.className = 'text-center my-3';
-    loader.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Processando...</span></div>';
+    loader.className = 'text-center my-4';
+    loader.innerHTML = '<div class="spinner-border text-primary" style="width:3rem;height:3rem;" role="status"><span class="visually-hidden">Processando...</span></div>';
 
-    form.onsubmit = async function(e) {
-        e.preventDefault();
+    // Helper to submit form, optionally with a forceSource override
+    async function submitForm(forceSource) {
+        let ambiguousDetected = false;
         resultDiv.classList.add('d-none');
-        form.parentNode.insertBefore(loader, form.nextSibling);
+        // insert loader after the form
+    try { form.parentNode.insertBefore(loader, form.nextSibling); } catch(e){ console.error('loader insert error', e); }
         try {
             const formData = new FormData(form);
+            if (forceSource) formData.set('forceSource', forceSource);
             const response = await fetch('/classify', {
                 method: 'POST',
                 body: formData
             });
             let data;
-            try {
-                data = await response.json();
-            } catch (err) {
-                data = {categoria: 'Erro', resposta: 'Erro ao processar resposta do servidor.'};
+            try { data = await response.json(); } catch (err) { console.error('invalid json from /classify', err); data = {categoria: 'Erro', resposta: 'Erro ao processar resposta do servidor.'}; }
+
+            // If server indicates ambiguity, show modal to let user choose
+            if (data && data.ambiguous) {
+                ambiguousDetected = true;
+                const ambigModalEl = document.getElementById('ambigModal');
+                const ambigModal = new bootstrap.Modal(ambigModalEl);
+                document.getElementById('ambigMessage').textContent = data.message || 'Escolha a fonte para prosseguir.';
+                document.getElementById('ambigFormPreview').textContent = data.form_preview || '';
+                document.getElementById('ambigFilePreview').textContent = data.file_preview || '';
+                // attach handlers (replace previous handlers)
+                const useFormBtn = document.getElementById('useFormBtn');
+                const useFileBtn = document.getElementById('useFileBtn');
+                useFormBtn.onclick = async () => { ambigModal.hide(); await submitForm('form'); };
+                useFileBtn.onclick = async () => { ambigModal.hide(); await submitForm('file'); };
+                ambigModal.show();
+                return;
             }
+
             categoriaSpan.textContent = data.categoria || 'Erro';
             respostaSpan.textContent = data.resposta || 'Erro ao processar.';
         } catch (error) {
+            console.error('submitForm error', error);
             categoriaSpan.textContent = 'Erro';
             respostaSpan.textContent = 'Falha na comunicação com o servidor.';
         } finally {
-            loader.remove();
-            resultDiv.classList.remove('d-none');
+            try { loader.remove(); } catch(e){ console.error('loader remove error', e); }
+            if (!ambiguousDetected) resultDiv.classList.remove('d-none');
         }
-    };
+    }
+
+    form.onsubmit = function(e){ e.preventDefault(); submitForm(); };
 
     clearBtn.onclick = function() {
         emailText.value = '';
         emailFile.value = '';
         resultDiv.classList.add('d-none');
     };
+
+    })();
     </script>
 </body>
 </html>

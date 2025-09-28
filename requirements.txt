@@ -1,12 +1,10 @@
-# Requisitos do projeto
+# Requisitos mínimos do projeto
 flask
-transformers
+flask_sqlalchemy
+python-dotenv
 openai
 pdfplumber
-scikit-learn
-nltk
-python-dotenv
-werkzeug
-google-generativeai
-pytesseract
 pillow
+pytesseract
+nltk
+pytest
