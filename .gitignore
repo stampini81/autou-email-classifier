@@ -11,3 +11,8 @@ emails.db
 .vscode/
 # Pytest cache
 .pytest_cache/
+# Coverage
+.coverage
+coverage.xml
+# Sonar
+.scannerwork/

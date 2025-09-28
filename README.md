@@ -1,4 +1,3 @@
-
 # Classificador de E-mails com IA para AutoU
 
 ![CI](https://github.com/<SEU_USUARIO>/<SEU_REPOSITORIO>/actions/workflows/ci.yml/badge.svg)
@@ -66,7 +65,7 @@ pip install -r requirements.txt
 
 # Baixe os pacotes necessários do NLTK
 python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt')"
-````
+```
 
 ### 2\. Configuração do Ambiente
 
@@ -132,6 +131,39 @@ O repositório está configurado com um workflow de Integração Contínua usand
 
   * **LinkedIn:** [https://www.linkedin.com/in/leandro-da-silva-stampini-07b04aa3]
   * **GitHub:** [https://github.com/stampini81]
+
+---
+
+## Usando o app_v2 (dev)
+
+1. Crie e ative um virtualenv (PowerShell):
+
+    ```powershell
+    python -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    pip install -r requirements.txt
+    ```
+
+2. Copie `.env.example` para `.env` e preencha `OPENAI_API_KEY`.
+
+3. Inicialize o banco de dados:
+
+    ```powershell
+    python scripts/create_db.py
+    ```
+
+4. Rode a aplicação v2:
+
+    ```powershell
+    python run_v2.py
+    # abrir http://localhost:5001
+    ```
+
+5. Rodar testes unitários:
+
+    ```powershell
+    pytest -q
+    ```
 
 
 
