@@ -121,7 +121,13 @@ Este projeto é a minha submissão para o case prático do processo seletivo da 
 
 ### Testes Unitários (Pytest)
 
+
 #### Rodar localmente
+Antes de rodar os testes, instale as dependências de desenvolvimento (pytest, pytest-cov) no ambiente virtual:
+```powershell
+pip install -r requirements.txt
+```
+Depois, execute os testes:
 ```powershell
 python -m pytest app_v2/tests/
 ```
@@ -132,9 +138,15 @@ docker-compose run --rm app pytest app_v2/tests/
 ```
 Substitua `app` pelo nome do serviço se for diferente no seu docker-compose.yml.
 
+
 #### Gerar relatório de cobertura para SonarQube
+Antes de rodar, garanta que as dependências estejam instaladas:
 ```powershell
-pytest --cov=app_v2 --cov-report=xml
+pip install -r requirements.txt
+```
+Depois, gere o relatório:
+```powershell
+python -m pytest --cov=app_v2 --cov-report=xml
 ```
 Isso irá gerar o arquivo `coverage.xml` na raiz do projeto, necessário para análise de cobertura pelo SonarQube.
 
