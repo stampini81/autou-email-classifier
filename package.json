@@ -1,0 +1,15 @@
+{
+  "name": "autou-email-classifier",
+  "version": "1.0.0",
+  "description": "Projeto de classificação automática de e-mails com testes Cypress.",
+  "main": "index.js",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^15.3.0"
+  }
+}

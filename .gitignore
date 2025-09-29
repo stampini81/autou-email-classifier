@@ -16,3 +16,6 @@ emails.db
 coverage.xml
 # Sonar
 .scannerwork/
+
+# Node.js
+node_modules/
