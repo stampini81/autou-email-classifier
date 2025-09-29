@@ -18,7 +18,7 @@ Este projeto é a minha submissão para o case prático do processo seletivo da 
 
 ## 🚀 Acesso Rápido
 
-* **Aplicação Online:** **[LINK DA SUA APLICAÇÃO HOSPEDADA AQUI]**
+* **Aplicação Online:** **[https://autou-email-classifier-00bj.onrender.com/]**
 * **Vídeo Demonstrativo:** **[LINK DO SEU VÍDEO NO YOUTUBE AQUI]**
 
 ---
@@ -144,6 +144,7 @@ O projeto utiliza GitHub Actions para rodar testes e análise de código a cada 
   * **GitHub:** [https://github.com/stampini81]
 
 ---
+
 
 
 
