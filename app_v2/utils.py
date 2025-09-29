@@ -76,27 +76,19 @@ def clean_placeholders(text, support_phone=None, support_email=None):
 
 def call_openai_chat(messages, model='gpt-3.5-turbo', max_tokens=700, temperature=0.1):
     try:
-        # Prefer the new OpenAI client (openai>=1.0). Use it if available.
-        try:
-            from openai import OpenAI
-            client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-            resp = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=temperature
-            )
-            # resp.choices[0].message.content is the same shape as before
-            return resp.choices[0].message.content
-        except Exception:
-            # Fallback to older openai library interface if present
-            resp = openai.ChatCompletion.create(
-                model=model,
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=temperature
-            )
-            return resp.choices[0].message.content
+        from openai import OpenAI
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            print('[OpenAI v2] Erro: OPENAI_API_KEY não está definido no ambiente.')
+            return None
+        client = OpenAI(api_key=api_key)
+        resp = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature
+        )
+        return resp.choices[0].message.content
     except Exception:
         import traceback
         print('[OpenAI v2] Erro detalhado:\n', traceback.format_exc())
