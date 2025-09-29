@@ -105,12 +105,19 @@ Este projeto é a minha submissão para o case prático do processo seletivo da 
 - Use o arquivo `.env` para definir `OPENAI_API_KEY` e outras variáveis.
 - O Docker Compose já carrega automaticamente o `.env`.
 
+
 ### Testes Automatizados
 
-Para rodar os testes:
-```bash
-pytest -q
+#### Rodar testes localmente
+```powershell
+python -m pytest app_v2/tests/
 ```
+
+#### Rodar testes no container (Docker Compose)
+```powershell
+docker-compose run --rm app pytest app_v2/tests/
+```
+Substitua `app` pelo nome do serviço se for diferente no seu docker-compose.yml.
 
 ### CI/CD
 O projeto utiliza GitHub Actions para rodar testes e análise de código a cada push/pull request.
