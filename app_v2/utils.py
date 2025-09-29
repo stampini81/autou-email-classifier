@@ -142,10 +142,11 @@ def classify_email(text, support_phone=None, support_email=None):
     ambig_palavras = [
         'olá', 'tudo bem', 'bom dia', 'boa tarde', 'boa noite', 'oi', 'saudações', 'cumprimentos', 'como vai', 'espero que esteja bem', 'espero que estejam bem'
     ]
-    if any(word in categoria_lower for word in ['produtivo', 'suporte', 'ação', 'atualização', 'dúvida', 'tecnico', 'técnico', 'problema', 'reclamação', 'pedido', 'solicitação', 'urgente', 'resposta']):
-        categoria_final = 'Produtivo'
-    elif any(word in categoria_lower for word in ['improdutivo', 'felicita', 'obrigado', 'agradecimento', 'paraben', 'parabéns', 'sem ação', 'irrelevante', 'informativo', 'spam']):
+    # Priorizar improdutivo para evitar erro de substring
+    if any(word in categoria_lower for word in ['improdutivo', 'felicita', 'obrigado', 'agradecimento', 'paraben', 'parabéns', 'sem ação', 'irrelevante', 'informativo', 'spam']):
         categoria_final = 'Improdutivo'
+    elif any(word in categoria_lower for word in ['produtivo', 'suporte', 'ação', 'atualização', 'dúvida', 'tecnico', 'técnico', 'problema', 'reclamação', 'pedido', 'solicitação', 'urgente', 'resposta']):
+        categoria_final = 'Produtivo'
     elif any(word in texto_lower for word in ambig_palavras):
         categoria_final = 'Improdutivo'
     else:
