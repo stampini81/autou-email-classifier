@@ -116,18 +116,66 @@ Este projeto é a minha submissão para o case prático do processo seletivo da 
 - O Docker Compose já carrega automaticamente o `.env`.
 
 
-### Testes Automatizados
 
-#### Rodar testes localmente
+## 🧪 Testes Automatizados e Validações
+
+### Testes Unitários (Pytest)
+
+#### Rodar localmente
 ```powershell
 python -m pytest app_v2/tests/
 ```
 
-#### Rodar testes no container (Docker Compose)
+#### Rodar no container (Docker Compose)
 ```powershell
 docker-compose run --rm app pytest app_v2/tests/
 ```
 Substitua `app` pelo nome do serviço se for diferente no seu docker-compose.yml.
+
+#### Gerar relatório de cobertura para SonarQube
+```powershell
+pytest --cov=app_v2 --cov-report=xml
+```
+Isso irá gerar o arquivo `coverage.xml` na raiz do projeto, necessário para análise de cobertura pelo SonarQube.
+
+---
+
+### Testes E2E (Cypress)
+
+#### Instalação do Cypress
+Se ainda não instalou as dependências do Node:
+```powershell
+npm install
+```
+
+#### Executar todos os testes Cypress (modo headless)
+```powershell
+npx cypress run
+```
+
+#### Executar Cypress com interface gráfica
+```powershell
+npx cypress open
+```
+
+Os testes E2E estão em `cypress/e2e/` e cobrem cenários produtivo, improdutivo, ambiguidade e upload.
+
+---
+
+### Análise de Qualidade e Cobertura (SonarQube)
+
+#### Pré-requisitos
+- SonarQube rodando localmente (ex: http://localhost:9000)
+- Variável de ambiente `SONAR_TOKEN` configurada
+
+#### Executar análise SonarQube
+```powershell
+pytest --cov=app_v2 --cov-report=xml
+sonar-scanner
+```
+O arquivo `sonar-project.properties` já está configurado para incluir testes unitários e E2E (Cypress). A cobertura de código Python é lida do `coverage.xml`.
+
+---
 
 ### CI/CD
 O projeto utiliza GitHub Actions para rodar testes e análise de código a cada push/pull request.
