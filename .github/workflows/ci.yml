@@ -80,10 +80,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Sonar Scanner
-        if: ${{ env.SONAR_TOKEN != '' }}
+      - name: Download SonarScanner CLI
+        run: |
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+          unzip sonar-scanner-cli-5.0.1.3006-linux.zip
+          echo "$PWD/sonar-scanner-5.0.1.3006-linux/bin" >> $GITHUB_PATH
+
+      - name: Run SonarQube Scanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        uses: SonarSource/sonarcloud-github-action@v1
-        with:
-          args: -Dsonar.login=${{ env.SONAR_TOKEN }}
+        run: |
+          sonar-scanner -Dsonar.login=$SONAR_TOKEN
