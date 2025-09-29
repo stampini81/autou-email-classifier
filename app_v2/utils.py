@@ -104,6 +104,10 @@ def call_openai_chat(messages, model='gpt-3.5-turbo', max_tokens=700, temperatur
 
 
 def classify_email(text, support_phone=None, support_email=None):
+    # Forçar 'Olá, tudo bem?' como improdutivo
+    if (text or '').strip().lower() in ['olá, tudo bem?', 'ola, tudo bem?', 'olá tudo bem?', 'ola tudo bem?']:
+        resposta = clean_placeholders(resposta, support_phone, support_email) if 'resposta' in locals() else ''
+        return 'Improdutivo', resposta or 'Mensagem de saudação detectada. Nenhuma ação necessária.'
     # Prompt estruturado para garantir saída previsível (JSON)
     nome = os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
     empresa = os.getenv('EMPRESA_ASSINATURA', 'AUTOU')
@@ -124,25 +128,39 @@ def classify_email(text, support_phone=None, support_email=None):
     if not out:
         return 'Indefinido', 'Não foi possível gerar resposta.'
 
-    # Tentar interpretar saída JSON
     raw = out.strip()
-    # Log curto para debugging (não imprime a chave)
     print('[app_v2] saída bruta do modelo:', raw[:1000])
     try:
         parsed = json.loads(raw)
-        categoria = parsed.get('categoria') or parsed.get('category') or 'Indefinido'
+        categoria = parsed.get('categoria') or parsed.get('category') or ''
         resposta = parsed.get('resposta') or parsed.get('response') or ''
-        resposta = clean_placeholders(resposta, support_phone, support_email)
-        return categoria.capitalize() if isinstance(categoria, str) else 'Indefinido', resposta
     except Exception:
-        # Fallback: parsing por heurística (compatibilidade com formato antigo)
-        cat = 'Indefinido'
-        resp = raw
+        # fallback heurístico
+        categoria = ''
+        resposta = raw
         for line in raw.splitlines():
             if line.lower().startswith('categoria:'):
-                cat = line.split(':', 1)[1].strip().capitalize()
+                categoria = line.split(':', 1)[1].strip()
             if line.lower().startswith('resposta:'):
-                resp = line.split(':', 1)[1].strip() + ' ' + ' '.join(l.strip() for l in raw.splitlines()[1:])
+                resposta = line.split(':', 1)[1].strip() + ' ' + ' '.join(l.strip() for l in raw.splitlines()[1:])
                 break
-        resp = clean_placeholders(resp, support_phone, support_email)
-        return cat, resp
+    # Normalização para apenas duas categorias
+    categoria_lower = categoria.lower()
+    texto_lower = (text or '').lower()
+    ambig_palavras = [
+        'olá', 'tudo bem', 'bom dia', 'boa tarde', 'boa noite', 'oi', 'saudações', 'cumprimentos', 'como vai', 'espero que esteja bem', 'espero que estejam bem'
+    ]
+    if any(word in categoria_lower for word in ['produtivo', 'suporte', 'ação', 'atualização', 'dúvida', 'tecnico', 'técnico', 'problema', 'reclamação', 'pedido', 'solicitação', 'urgente', 'resposta']):
+        categoria_final = 'Produtivo'
+    elif any(word in categoria_lower for word in ['improdutivo', 'felicita', 'obrigado', 'agradecimento', 'paraben', 'parabéns', 'sem ação', 'irrelevante', 'informativo', 'spam']):
+        categoria_final = 'Improdutivo'
+    elif any(word in texto_lower for word in ambig_palavras):
+        categoria_final = 'Improdutivo'
+    else:
+        # fallback: se não identificar, assume produtivo se houver perguntas ou solicitações
+        if '?' in raw or 'por favor' in raw.lower() or 'poderia' in raw.lower() or 'solicito' in raw.lower():
+            categoria_final = 'Produtivo'
+        else:
+            categoria_final = 'Improdutivo'
+    resposta = clean_placeholders(resposta, support_phone, support_email)
+    return categoria_final, resposta
