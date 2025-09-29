@@ -19,7 +19,7 @@ RUN python -m pip install -r /app/requirements.txt
 # Copy app
 COPY . /app
 
-ENV FLASK_APP=app/main.py
-EXPOSE 5000
+ENV FLASK_APP=run_v2.py
+EXPOSE 5001
 
-CMD ["python", "app/main.py"]
+CMD ["python", "run_v2.py"]

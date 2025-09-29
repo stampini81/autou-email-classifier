@@ -33,97 +33,91 @@ Este projeto é a minha submissão para o case prático do processo seletivo da 
 
 ---
 
-## ⚙️ Configuração e Execução Local
 
-Siga os passos abaixo para configurar e executar o projeto em seu ambiente local.
+## ⚙️ Como Executar o Projeto
 
-### Pré-requisitos
+### Execução Local (SQLite)
 
-* Python 3.10+
-* Git
-* [Tesseract OCR](https://github.com/tesseract-ocr/tessdoc) (necessário para processar PDFs de imagem. Se preferir, pule esta instalação e use o Docker).
-* Uma chave de API válida da OpenAI.
+1. **Pré-requisitos:**
+    - Python 3.11+
+    - Git
+    - [Tesseract OCR](https://github.com/tesseract-ocr/tessdoc) (opcional se usar Docker)
+    - Chave da OpenAI
 
-### 1. Instalação
 
-Clone o repositório e instale as dependências Python em um ambiente virtual.
+2. **Instalação e Ambiente Virtual:**
 
+    > **Recomendado:** Sempre use um ambiente virtual para isolar as dependências do projeto.
+
+    ```powershell
+    # Clone o repositório
+    git clone https://github.com/<SEU_USUARIO>/<SEU_REPOSITORIO>.git
+    cd <NOME_DO_DIRETORIO>
+
+    # Crie o ambiente virtual
+    python -m venv .venv
+
+    # Ative o ambiente virtual (Windows)
+    .\.venv\Scripts\Activate.ps1
+
+    # Instale as dependências
+    pip install -r requirements.txt
+
+    # Baixe os pacotes necessários do NLTK
+    python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt')"
+    ```
+
+3. **Configuração:**
+    - Copie `.env.example` para `.env` e preencha sua chave OpenAI e outras variáveis.
+
+4. **Inicialize o banco (opcional, SQLite):**
+    ```powershell
+    python scripts/create_db.py
+    ```
+
+5. **Execute a aplicação:**
+    ```powershell
+    python run_v2.py
+    # Acesse http://localhost:5001
+    ```
+
+### Execução com Docker Compose (PostgreSQL)
+
+1. **Pré-requisitos:**
+    - Docker e Docker Compose
+
+2. **Configuração:**
+    - Copie `.env.example` para `.env` e preencha sua chave OpenAI e outras variáveis.
+
+3. **Suba os containers:**
+    ```powershell
+    docker-compose up --build
+    # Acesse http://localhost:5001
+    ```
+    - O banco de dados será criado automaticamente.
+    - O app usará PostgreSQL no container e SQLite localmente.
+
+#### Portas
+- A aplicação roda sempre na porta **5001** (local e Docker).
+- O banco PostgreSQL roda na porta **5432** (apenas no Docker).
+
+#### Variáveis de ambiente
+- Use o arquivo `.env` para definir `OPENAI_API_KEY` e outras variáveis.
+- O Docker Compose já carrega automaticamente o `.env`.
+
+### Testes Automatizados
+
+Para rodar os testes:
 ```bash
-# Clone o repositório
-git clone [https://github.com/](https://github.com/)<SEU_USUARIO>/<SEU_REPOSITORIO>.git
-cd <NOME_DO_DIRETORIO>
-
-# Crie e ative o ambiente virtual
-python -m venv .venv
-# Windows
-.\.venv\Scripts\Activate.ps1
-# macOS / Linux
-source .venv/bin/activate
-
-# Instale as dependências
-pip install -r requirements.txt
-
-# Baixe os pacotes necessários do NLTK
-python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt')"
+pytest -q
 ```
 
-### 2\. Configuração do Ambiente
+### CI/CD
+O projeto utiliza GitHub Actions para rodar testes e análise de código a cada push/pull request.
 
-Crie um arquivo chamado `.env` na raiz do projeto e adicione suas variáveis de ambiente.
+---
 
-```env
-# .env
-OPENAI_API_KEY="sk-sua-chave-aqui"
-SUPPORT_PHONE="+55 (11) 4000-0000"
-SUPPORT_EMAIL="suporte@autou.com.br"
-```
 
-**Importante:** O arquivo `.env` está no `.gitignore` e nunca deve ser versionado.
-
-### 3\. Execução
-
-Com o ambiente virtual ativado, inicie a aplicação Flask:
-
-```bash
-python app/main.py
-```
-
-A aplicação estará disponível em **[http://127.0.0.1:5000](http://127.0.0.1:5000)**.
-
------
-
-## 🐳 Executando com Docker
-
-Se você não quiser instalar o Tesseract e as dependências localmente, pode usar o Docker. O `Dockerfile` já cuida de toda a configuração.
-
-```bash
-# 1. Construa a imagem Docker
-docker build -t autou-email-classifier .
-
-# 2. Execute o container, passando o arquivo .env
-docker run -p 5000:5000 --env-file .env autou-email-classifier
-```
-
-A aplicação estará disponível em **[http://localhost:5000](https://www.google.com/search?q=http://localhost:5000)**.
-
------
-
-## 🧪 Testes Automatizados
-
-O projeto conta com uma suíte de testes automatizados para garantir a qualidade do código e das funcionalidades principais. Para executá-los:
-
-```bash
-python -m pytest -q
-```
-
-## 🔄 CI/CD
-
-O repositório está configurado com um workflow de Integração Contínua usando **GitHub Actions** (`.github/workflows/ci.yml`). A cada `push` ou `pull request`, o workflow realiza as seguintes ações:
-
-1.  Configura o ambiente Python.
-2.  Instala as dependências do projeto.
-3.  Instala o Tesseract OCR.
-4.  Executa a suíte de testes com `pytest`.
 
 ## 👤 Contato
 
@@ -134,36 +128,7 @@ O repositório está configurado com um workflow de Integração Contínua usand
 
 ---
 
-## Usando o app_v2 (dev)
 
-1. Crie e ative um virtualenv (PowerShell):
-
-    ```powershell
-    python -m venv .venv
-    .\.venv\Scripts\Activate.ps1
-    pip install -r requirements.txt
-    ```
-
-2. Copie `.env.example` para `.env` e preencha `OPENAI_API_KEY`.
-
-3. Inicialize o banco de dados:
-
-    ```powershell
-    python scripts/create_db.py
-    ```
-
-4. Rode a aplicação v2:
-
-    ```powershell
-    python run_v2.py
-    # abrir http://localhost:5001
-    ```
-
-5. Rodar testes unitários:
-
-    ```powershell
-    pytest -q
-    ```
 
 
 

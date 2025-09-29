@@ -23,12 +23,17 @@ def create_app():
     else:
         print('[app_v2] AVISO: OPENAI_API_KEY não encontrada. Verifique .env ou variável de ambiente')
 
+
     app = Flask(
         __name__,
         template_folder=str(BASE_DIR / "templates"),
         static_folder=str(BASE_DIR / "static"),
     )
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{BASE_DIR / 'emails.db'}"
+    db_uri = os.getenv("SQLALCHEMY_DATABASE_URI")
+    if db_uri:
+        app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
+    else:
+        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{BASE_DIR / 'emails.db'}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)

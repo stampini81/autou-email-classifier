@@ -8,3 +8,4 @@ pillow
 pytesseract
 nltk
 pytest
+psycopg2-binary
