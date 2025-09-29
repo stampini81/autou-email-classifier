@@ -10,7 +10,7 @@ O serviço pode demorar alguns segundos para iniciar caso esteja hibernando (pla
 Caso queira rodar localmente, siga as instruções abaixo (já presentes neste README).
 # Classificador de E-mails com IA para AutoU
 
-![CI](https://github.com/stampini81/https://github.com/stampini81/autou-email-classifier/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/stampini81/autou-email-classifier/actions/workflows/ci.yml/badge.svg)
 
 Este projeto é a minha submissão para o case prático do processo seletivo da AutoU. A aplicação web utiliza Inteligência Artificial para classificar e-mails como "Produtivo" ou "Improdutivo" e sugerir uma resposta automática, otimizando o fluxo de trabalho de equipes que lidam com um grande volume de mensagens.
 
@@ -144,6 +144,7 @@ O projeto utiliza GitHub Actions para rodar testes e análise de código a cada 
   * **GitHub:** [https://github.com/stampini81]
 
 ---
+
 
 
 
