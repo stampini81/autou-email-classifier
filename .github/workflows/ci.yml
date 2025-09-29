@@ -67,12 +67,14 @@ jobs:
     name: Sonar scan
     needs: unit
     runs-on: ubuntu-latest
-    if: ${{ secrets.SONAR_TOKEN != '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Sonar Scanner
+        if: ${{ env.SONAR_TOKEN != '' }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         uses: SonarSource/sonarcloud-github-action@v1
         with:
-          args: -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          args: -Dsonar.login=${{ env.SONAR_TOKEN }}
