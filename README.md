@@ -1,3 +1,13 @@
+# Deploy na Nuvem
+
+Esta aplicação está hospedada gratuitamente na plataforma Render. Para acessar e testar a solução online, utilize o link abaixo:
+
+**Acesse aqui:** [https://autou-email-classifier-00bj.onrender.com](https://autou-email-classifier-00bj.onrender.com)
+
+O serviço pode demorar alguns segundos para iniciar caso esteja hibernando (plano gratuito Render).
+
+---
+Caso queira rodar localmente, siga as instruções abaixo (já presentes neste README).
 # Classificador de E-mails com IA para AutoU
 
 ![CI](https://github.com/<SEU_USUARIO>/<SEU_REPOSITORIO>/actions/workflows/ci.yml/badge.svg)
