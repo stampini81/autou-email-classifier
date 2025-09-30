@@ -117,12 +117,21 @@ def classify_email(text, support_phone=None, support_email=None):
     if any(texto_limpo == s or texto_limpo.startswith(s + ' ') or texto_limpo.endswith(' ' + s) or texto_limpo == s for s in saudacoes_simples):
         return 'Improdutivo', 'Olá! Agradecemos sua mensagem. Tenha um excelente dia. ' + os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
 
-    # Regra para qualquer agradecimento ser improdutivo
+    # Regra: agradecimento puro é improdutivo, mas se houver solicitação/problema junto, é produtivo
     agradecimentos = [
         'obrigado', 'obrigada', 'muito obrigado', 'muito obrigada'
     ]
     texto_limpo_sem_pontuacao = re.sub(r'[.!?,;:]', '', texto_limpo)
-    if any(agr in texto_limpo_sem_pontuacao for agr in agradecimentos):
+    contem_agradecimento = any(agr in texto_limpo_sem_pontuacao for agr in agradecimentos)
+    # Palavras-chave que indicam solicitação, dúvida ou problema (exceto palavras neutras como 'suporte', 'ajuda', 'atendimento')
+    palavras_produtivas = [
+        'preciso', 'solicito', 'poderia', 'gostaria', 'necessito', 'aguardo', 'favor', 'por favor', 'problema', 'erro', 'dúvida', 'duvida', 'acesso', 'atualização', 'atualizacao', 'relatório', 'relatorio', 'parecer', 'urgente', 'resposta', 'encaminho', 'envio', 'anexo', 'documento', 'reclamação', 'reclamacao', 'dificuldade', 'instabilidade', 'não consigo', 'nao consigo', 'não acessa', 'nao acessa', 'não abre', 'nao abre', 'não carrega', 'nao carrega', 'sistema', 'ticket', 'chamado', 'acessar', 'acessando', 'acessaram', 'acessou', 'acessarei', 'acessaria'
+    ]
+    contem_produtivo = any(p in texto_limpo_sem_pontuacao for p in palavras_produtivas)
+    # Se for agradecimento puro ou agradecimento + menção a suporte/ajuda/atendimento, mas sem solicitação explícita, é improdutivo
+    palavras_neutras = ['suporte', 'ajuda', 'atendimento']
+    contem_neutro = any(n in texto_limpo_sem_pontuacao for n in palavras_neutras)
+    if contem_agradecimento and (not contem_produtivo) and (not contem_neutro or contem_neutro):
         return 'Improdutivo', 'Olá! Agradecemos sua mensagem. Tenha um excelente dia. ' + os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
 
     nome = os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
