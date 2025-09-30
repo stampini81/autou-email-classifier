@@ -133,7 +133,12 @@ def classify_email(text, support_phone=None, support_email=None):
         'pedido', 'solicitação', 'solicito', 'urgente', 'resposta', 'relatório', 'análise', 'parecer técnico', 'documento',
         'em anexo', 'segue em anexo', 'envio', 'encaminho', 'aguardo retorno', 'aguardo parecer', 'aguardo resposta',
         'retorno', 'parecer', 'verificar', 'orientação', 'dificuldade', 'acesso', 'instabilidade', 'suporte técnico',
-        'problemas', 'acessar', 'acessando', 'acessaram', 'acessou', 'acessando', 'acessarei', 'acessaria'
+        'problemas', 'acessar', 'acessando', 'acessaram', 'acessou', 'acessando', 'acessarei', 'acessaria',
+        # Adicionados para tratar casos mencionados pelo usuário
+        'sistema parado', 'preciso de suporte', 'ajuda com lentidão', 'sistema', 'lentidão', 'parado', 'erro no sistema',
+        'sistema fora', 'sistema caiu', 'sistema não funciona', 'sistema travado', 'sistema instável', 'sistema lento',
+        'problema no sistema', 'problemas no sistema', 'não consigo acessar', 'não acessa', 'não abre', 'não carrega',
+        'preciso de ajuda', 'preciso de atendimento', 'preciso de suporte', 'ajuda', 'atendimento', 'suporte', 'parou', 'parada'
     ]
 
     # Normalizar listas de palavras-chave (remover acentos)
