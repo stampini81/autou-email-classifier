@@ -28,7 +28,7 @@ def test_classify_ambiguidade():
 
 
 def test_classify_informativo():
-    texto = "Informamos que o sistema estará em manutenção amanhã."
+    texto = "Apenas informando que estarei ausente amanhã."
     categoria, resposta = classify_email(texto)
     assert categoria == "Improdutivo"
     assert isinstance(resposta, str) and resposta
