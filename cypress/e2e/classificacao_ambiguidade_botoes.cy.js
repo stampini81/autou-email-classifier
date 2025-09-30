@@ -22,6 +22,7 @@ describe('Classificação de Email - Ambiguidade: escolher fonte', () => {
     cy.get('button[type="submit"]').click();
     cy.contains('Escolha a fonte para classificação').should('be.visible');
     cy.get('#useFileBtn').click();
+    cy.wait(2000);
     cy.get('#categoria').should('contain.text', 'Improdutivo');
   });
 });

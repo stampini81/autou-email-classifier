@@ -61,6 +61,13 @@ jobs:
 
       - name: Run Cypress tests
         uses: cypress-io/github-action@v5
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-3.5-turbo
+          NOME_ASSINATURA: Leandro da Silva Stampini
+          EMPRESA_ASSINATURA: AUTOU
+          SUPPORT_PHONE: +55 (11) 4000-0000
+          SUPPORT_EMAIL: suporte@autou.com.br
         with:
           start: python run_v2.py
           wait-on: 'http://localhost:5001'
@@ -90,4 +97,16 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          sonar-scanner -Dsonar.login=$SONAR_TOKEN
+          sonar-scanner -Dsonar.token=$SONAR_TOKEN
+
+  build:
+    name: Build Docker image
+    needs: e2e
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t autou-classifier .

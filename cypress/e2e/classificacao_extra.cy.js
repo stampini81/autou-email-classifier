@@ -31,7 +31,7 @@ describe('Classificação de Email - Casos Extras', () => {
     cy.get('textarea[name="emailText"]').type('Solicito atualização do meu cadastro.');
   cy.get('button[type="submit"]').click();
   cy.wait(500);
-  cy.get('#categoria').should('contain.text', 'Improdutivo');
+  cy.get('#categoria').should('contain.text', 'Produtivo');
   });
 
   it('Deve classificar um email produtivo (pergunta)', () => {

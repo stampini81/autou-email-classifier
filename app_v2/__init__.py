@@ -15,6 +15,13 @@ logger = logging.getLogger(__name__)
 def create_app():
     # carregar .env e configurar OpenAI uma única vez aqui
     load_dotenv()
+    # Log para verificar se as variáveis do .env foram carregadas
+    print("[DEBUG] Variáveis de ambiente carregadas:")
+    print("OPENAI_API_KEY:", bool(os.getenv("OPENAI_API_KEY")))
+    print("SUPPORT_PHONE:", os.getenv("SUPPORT_PHONE"))
+    print("SUPPORT_EMAIL:", os.getenv("SUPPORT_EMAIL"))
+    print("NOME_ASSINATURA:", os.getenv("NOME_ASSINATURA"))
+    print("EMPRESA_ASSINATURA:", os.getenv("EMPRESA_ASSINATURA"))
     openai.api_key = os.getenv("OPENAI_API_KEY")
     # debug: confirmar que a chave foi carregada (não imprimir o valor)
     key_loaded = bool(openai.api_key)

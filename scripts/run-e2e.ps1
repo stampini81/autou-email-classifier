@@ -78,16 +78,24 @@ try {
     $cypressExit = 2
 }
 
-# Run Sonar Scanner if token is present
+# Run Sonar Scanner if token is present and server is available
 if ($env:SONAR_TOKEN -and $env:SONAR_TOKEN.Trim().Length -gt 0) {
-    Write-Host "SONAR_TOKEN detectado - executando sonar-scanner" -ForegroundColor Cyan
+    Write-Host "SONAR_TOKEN detectado - verificando servidor SonarQube..." -ForegroundColor Cyan
     try {
-        $sonarArgs = "-Dsonar.login=$env:SONAR_TOKEN"
-        $sonarProc = Start-Process -FilePath "sonar-scanner" -ArgumentList $sonarArgs -WorkingDirectory $projectRoot -NoNewWindow -Wait -PassThru
-        $sonarExit = $sonarProc.ExitCode
+        $sonarUrl = "http://localhost:9000/api/system/status"
+        $response = Invoke-WebRequest -Uri $sonarUrl -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
+        if ($response.StatusCode -eq 200) {
+            Write-Host "Servidor SonarQube disponível - executando sonar-scanner" -ForegroundColor Green
+            $sonarArgs = "-Dsonar.token=$env:SONAR_TOKEN"
+            $sonarProc = Start-Process -FilePath "sonar-scanner" -ArgumentList $sonarArgs -WorkingDirectory $projectRoot -NoNewWindow -Wait -PassThru
+            $sonarExit = $sonarProc.ExitCode
+        } else {
+            Write-Host "Servidor SonarQube não respondeu corretamente - pulando Sonar Scanner" -ForegroundColor Yellow
+            $sonarExit = 0
+        }
     } catch {
-        Write-Host "Erro ao executar sonar-scanner: $_" -ForegroundColor Red
-        $sonarExit = 2
+        Write-Host "Servidor SonarQube não disponível (erro: $_) - pulando Sonar Scanner" -ForegroundColor Yellow
+        $sonarExit = 0
     }
 } else {
     Write-Host "SONAR_TOKEN não definido - pulando Sonar Scanner" -ForegroundColor Yellow

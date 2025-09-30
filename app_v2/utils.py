@@ -1,6 +1,8 @@
 import os
+from dotenv import load_dotenv
 import re
 import json
+import unicodedata
 import tempfile
 import uuid
 import hashlib
@@ -18,6 +20,12 @@ for r in ["tokenizers/punkt", "corpora/stopwords"]:
         nltk.data.find(r)
     except LookupError:
         nltk.download(r.split('/')[-1])
+
+# Carregar .env se estiver disponível (garante que testes locais/venv vejam as variáveis)
+try:
+    load_dotenv()
+except Exception:
+    pass
 
 
 def extract_text(file_storage):
@@ -100,60 +108,82 @@ def classify_email(text, support_phone=None, support_email=None):
     if (text or '').strip().lower() in ['olá, tudo bem?', 'ola, tudo bem?', 'olá tudo bem?', 'ola tudo bem?']:
         resposta = clean_placeholders(resposta, support_phone, support_email) if 'resposta' in locals() else ''
         return 'Improdutivo', resposta or 'Mensagem de saudação detectada. Nenhuma ação necessária.'
-    # Prompt estruturado para garantir saída previsível (JSON)
+
     nome = os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
     empresa = os.getenv('EMPRESA_ASSINATURA', 'AUTOU')
-    system = (
-        f"Você é um assistente para a empresa {empresa} e deverá assinar como {nome}."
-        " Receba o conteúdo do e-mail e retorne **somente** um JSON com duas chaves:"
-        " 'categoria' (uma palavra ou expressão breve, ex: 'Suporte', 'Vendas', 'Spam', 'Ambiguidade')"
-        " e 'resposta' (texto da resposta ao cliente, assinatura inclusa)."
-        " Não inclua explicações adicionais fora do JSON."
-    )
 
-    user_prompt = (
-        "Receba o e-mail abaixo e gere o JSON solicitado.\n\n---EMAIL---\n" + text + "\n---FIM---"
-    )
-    messages = [{'role': 'system', 'content': system}, {'role': 'user', 'content': user_prompt}]
+    # Normalização para apenas duas categorias (remoção de acentos para comparações)
+    def _strip_accents(s):
+        if not s:
+            return ''
+        return ''.join(c for c in unicodedata.normalize('NFKD', s) if not unicodedata.combining(c))
 
-    out = call_openai_chat(messages, model=os.getenv('OPENAI_MODEL', 'gpt-3.5-turbo'))
-    if not out:
-        return 'Indefinido', 'Não foi possível gerar resposta.'
-
-    raw = out.strip()
-    print('[app_v2] saída bruta do modelo:', raw[:1000])
-    try:
-        parsed = json.loads(raw)
-        categoria = parsed.get('categoria') or parsed.get('category') or ''
-        resposta = parsed.get('resposta') or parsed.get('response') or ''
-    except Exception:
-        # fallback heurístico
-        categoria = ''
-        resposta = raw
-        for line in raw.splitlines():
-            if line.lower().startswith('categoria:'):
-                categoria = line.split(':', 1)[1].strip()
-            if line.lower().startswith('resposta:'):
-                resposta = line.split(':', 1)[1].strip() + ' ' + ' '.join(l.strip() for l in raw.splitlines()[1:])
-                break
-    # Normalização para apenas duas categorias
-    categoria_lower = categoria.lower()
-    texto_lower = (text or '').lower()
+    texto_lower = _strip_accents((text or '').lower())
     ambig_palavras = [
         'olá', 'tudo bem', 'bom dia', 'boa tarde', 'boa noite', 'oi', 'saudações', 'cumprimentos', 'como vai', 'espero que esteja bem', 'espero que estejam bem'
     ]
-    # Priorizar improdutivo para evitar erro de substring
-    if any(word in categoria_lower for word in ['improdutivo', 'felicita', 'obrigado', 'agradecimento', 'paraben', 'parabéns', 'sem ação', 'irrelevante', 'informativo', 'spam']):
-        categoria_final = 'Improdutivo'
-    elif any(word in categoria_lower for word in ['produtivo', 'suporte', 'ação', 'atualização', 'dúvida', 'tecnico', 'técnico', 'problema', 'reclamação', 'pedido', 'solicitação', 'urgente', 'resposta']):
+    improdutivo_keywords = [
+        'improdutivo', 'felicita', 'felicitação', 'felicitações', 'feliz aniversário', 'feliz natal', 'boas festas',
+        'obrigado', 'obrigada', 'agradecimento', 'agradecimentos', 'agradecer', 'paraben', 'parabéns', 'sem ação', 'irrelevante',
+        'informativo', 'spam', 'saudação', 'saudações', 'cumprimentos', 'bom dia', 'boa tarde', 'boa noite',
+        'tudo bem', 'como vai', 'espero que esteja bem', 'espero que estejam bem', 'mensagem social', 'mensagem pessoal'
+    ]
+    produtivo_keywords = [
+        'produtivo', 'suporte', 'ação', 'atualização', 'dúvida', 'tecnico', 'técnico', 'problema', 'reclamação',
+        'pedido', 'solicitação', 'solicito', 'urgente', 'resposta', 'relatório', 'análise', 'parecer técnico', 'documento',
+        'em anexo', 'segue em anexo', 'envio', 'encaminho', 'aguardo retorno', 'aguardo parecer', 'aguardo resposta',
+        'retorno', 'parecer', 'verificar', 'orientação', 'dificuldade', 'acesso', 'instabilidade', 'suporte técnico',
+        'problemas', 'acessar', 'acessando', 'acessaram', 'acessou', 'acessando', 'acessarei', 'acessaria'
+    ]
+
+    # Normalizar listas de palavras-chave (remover acentos)
+    improdutivo_norm = [_strip_accents(w.lower()) for w in improdutivo_keywords]
+    produtivo_norm = [_strip_accents(w.lower()) for w in produtivo_keywords]
+
+    # função utilitária para checar palavra inteira (evita colisões como 'produtivo' em 'improdutivo')
+    def _contains_word(s, w):
+        try:
+            return re.search(r"\b" + re.escape(w) + r"\b", s) is not None
+        except Exception:
+            return w in s
+
+    # Use heuristic for classification (count matches)
+    count_prod = sum(1 for p in produtivo_norm if _contains_word(texto_lower, p))
+    count_imp = sum(1 for p in improdutivo_norm if _contains_word(texto_lower, p))
+    if count_prod > count_imp:
         categoria_final = 'Produtivo'
+    elif count_imp > count_prod:
+        categoria_final = 'Improdutivo'
     elif any(word in texto_lower for word in ambig_palavras):
         categoria_final = 'Improdutivo'
     else:
-        # fallback: se não identificar, assume produtivo se houver perguntas ou solicitações
-        if '?' in raw or 'por favor' in raw.lower() or 'poderia' in raw.lower() or 'solicito' in raw.lower():
+        # fallback: assume produtivo se houver perguntas ou solicitações
+        if '?' in text or 'por favor' in texto_lower or 'poderia' in texto_lower or 'solicito' in texto_lower or 'aguardo' in texto_lower or 'anexo' in texto_lower or 'relatório' in texto_lower or 'parecer' in texto_lower or 'gostaria' in texto_lower or 'como' in texto_lower:
             categoria_final = 'Produtivo'
         else:
             categoria_final = 'Improdutivo'
+
+    # Use AI for response generation based on categoria_final
+    system = (
+        f"Você é um assistente para a empresa {empresa} e deverá assinar como {nome}."
+        f" O email foi classificado como '{categoria_final}'. Gere uma resposta adequada."
+        " Aqui estão exemplos de respostas adequadas:\n\n"
+        "Para emails Produtivos (que exigem ação):\n"
+        "- 'Olá! Recebemos sua solicitação sobre o problema de acesso à plataforma. Um ticket de suporte (#TICKET-2023-XYZ) foi aberto e nossa equipe técnica já está investigando o ocorrido. Entraremos em contato com uma atualização em até 60 minutos. Agradecemos a sua paciência.'\n"
+        "- 'Olá. Agradecemos o seu contato. Estamos verificando o status atual da sua transferência internacional (protocolo 456789) junto ao nosso time de operações. Um de nossos especialistas enviará uma atualização detalhada sobre o processo em breve. Obrigado por aguardar.'\n"
+        "- 'Prezado, recebemos sua dúvida sobre o informe de rendimentos do fundo. Sua pergunta foi encaminhada para um de nossos especialistas em tributação de investimentos. Ele irá analisar sua questão e responderá diretamente a este e-mail com todos os esclarecimentos necessários. Agradecemos o contato.'\n\n"
+        "Para emails Improdutivos (sociais ou informativos):\n"
+        "- 'Olá! Ficamos muito felizes em saber que sua experiência foi positiva e que conseguimos ajudar. Seu feedback é muito importante para nós! Agradecemos o seu contato e desejamos um excelente dia.'\n"
+        "- 'Olá! Agradecemos imensamente seus votos. Nós também desejamos a você um excelente Natal e um Ano Novo próspero e cheio de alegrias. Boas festas!'\n"
+        "- 'Olá. Agradecemos o seu contato. No entanto, informamos que este canal é dedicado exclusivamente para suporte e dúvidas sobre nossos produtos e serviços financeiros. Para outras solicitações, por favor, utilize nossos canais de comunicação alternativos. Tenha um bom dia.'\n\n"
+        " Retorne **somente** o texto da resposta, com assinatura inclusa."
+    )
+    user_prompt = "Gere a resposta para o email: " + text
+
+    out_resp = call_openai_chat([{'role': 'system', 'content': system}, {'role': 'user', 'content': user_prompt}], model=os.getenv('OPENAI_MODEL', 'gpt-3.5-turbo'))
+    if out_resp:
+        resposta = out_resp.strip()
+    else:
+        resposta = "Não foi possível gerar resposta."
     resposta = clean_placeholders(resposta, support_phone, support_email)
     return categoria_final, resposta
