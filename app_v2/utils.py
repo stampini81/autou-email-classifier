@@ -104,10 +104,19 @@ def call_openai_chat(messages, model='gpt-3.5-turbo', max_tokens=700, temperatur
 
 
 def classify_email(text, support_phone=None, support_email=None):
-    # Forçar 'Olá, tudo bem?' como improdutivo
-    if (text or '').strip().lower() in ['olá, tudo bem?', 'ola, tudo bem?', 'olá tudo bem?', 'ola tudo bem?']:
-        resposta = clean_placeholders(resposta, support_phone, support_email) if 'resposta' in locals() else ''
-        return 'Improdutivo', resposta or 'Mensagem de saudação detectada. Nenhuma ação necessária.'
+
+    # Saudações simples: resposta curta e simpática
+
+    saudacoes_simples = [
+        'bom dia', 'boa tarde', 'boa noite', 'olá', 'ola', 'oi'
+    ]
+    # agradecimentos_simples removido: IA sempre gera resposta
+    texto_limpo = (text or '').strip().lower()
+    if texto_limpo in ['olá, tudo bem?', 'ola, tudo bem?', 'olá tudo bem?', 'ola tudo bem?']:
+        return 'Improdutivo', 'Olá! Agradecemos sua mensagem. Tenha um excelente dia. ' + os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
+    if any(texto_limpo == s or texto_limpo.startswith(s + ' ') or texto_limpo.endswith(' ' + s) or texto_limpo == s for s in saudacoes_simples):
+        return 'Improdutivo', 'Olá! Agradecemos sua mensagem. Tenha um excelente dia. ' + os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
+    # Para agradecimentos, IA irá gerar a resposta normalmente
 
     nome = os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
     empresa = os.getenv('EMPRESA_ASSINATURA', 'AUTOU')
