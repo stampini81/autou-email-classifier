@@ -116,7 +116,14 @@ def classify_email(text, support_phone=None, support_email=None):
         return 'Improdutivo', 'Olá! Agradecemos sua mensagem. Tenha um excelente dia. ' + os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
     if any(texto_limpo == s or texto_limpo.startswith(s + ' ') or texto_limpo.endswith(' ' + s) or texto_limpo == s for s in saudacoes_simples):
         return 'Improdutivo', 'Olá! Agradecemos sua mensagem. Tenha um excelente dia. ' + os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
-    # Para agradecimentos, IA irá gerar a resposta normalmente
+
+    # Regra para qualquer agradecimento ser improdutivo
+    agradecimentos = [
+        'obrigado', 'obrigada', 'muito obrigado', 'muito obrigada'
+    ]
+    texto_limpo_sem_pontuacao = re.sub(r'[.!?,;:]', '', texto_limpo)
+    if any(agr in texto_limpo_sem_pontuacao for agr in agradecimentos):
+        return 'Improdutivo', 'Olá! Agradecemos sua mensagem. Tenha um excelente dia. ' + os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
 
     nome = os.getenv('NOME_ASSINATURA', 'Leandro da Silva Stampini')
     empresa = os.getenv('EMPRESA_ASSINATURA', 'AUTOU')
